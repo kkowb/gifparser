@@ -55,7 +55,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.blit(surface_scaled, (0, 0))  # 显示放大后的图像
+        screen.blit(surface_scaled, (0, 0))
         pygame.display.flip()
 
     pygame.quit()
