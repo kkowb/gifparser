@@ -107,7 +107,7 @@ class GifParser():
         hex_str = self.hex_str
         local_color_table = hex_str[0 : size * 3 * 2]
         self.local_color_table = local_color_table
-
+    
     def test(self):
         log('logical_screen_descriptor', self.logical_screen_descriptor_data)
         log('global_color_table', self.global_color_table)
