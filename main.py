@@ -1,4 +1,3 @@
-from multiprocessing import process
 from utils import log, clear_log_file
 from gif_struct.get_header import get_header 
 from gif_struct.read_gif_hex import read_gif_hex 
@@ -16,12 +15,6 @@ from gif_struct.logical_screen_descriptor import (
     resolve_packed_field,
 )
 
-
-# def get_image_descriptor():
-#     str = reslove_extensions()
-#     res = reslove_image_descriptor(str)
-#     return res
-    
 
 # def get_local_color_table():
 #     image_descriptor = get_image_descriptor()
@@ -57,6 +50,8 @@ class GifParser():
         self.logical_screen_descriptor_data = {}
         self.global_color_table = ''
         self.graphic_control_extension = {}
+        self.image_descriptor = {}
+        self.local_color_table = ''
 
     def signature_and_version(self):
         signature, version = get_header(self.hex_str)
@@ -91,20 +86,35 @@ class GifParser():
     def reslove_hex_str(self):
         table = self.global_color_table
         self.hex_str = skip_global_color_table(table, self.hex_str)
-        # res = skip_extensions(str)
-        # return res
 
     def reslove_graphic_control_extension(self):
         d = graphic_control_extension(self.hex_str)
         self.graphic_control_extension = d
         self.hex_str = self.hex_str[16:]
     
+    def get_image_descriptor(self):
+        image_descriptor = reslove_image_descriptor(self.hex_str)
+        self.image_descriptor = image_descriptor
+        self.hex_str = self.hex_str[20:]
+
+    def get_local_color_table(self):
+        image_descriptor = self.image_descriptor
+        packed_filed = image_descriptor["packed_filed"]
+        size = packed_filed["size_of_local_color_table"]
+        if size == 0:
+            log("no local color table")
+            self.local_color_table = None
+        hex_str = self.hex_str
+        local_color_table = hex_str[0 : size * 3 * 2]
+        self.local_color_table = local_color_table
+
     def test(self):
         log('logical_screen_descriptor', self.logical_screen_descriptor_data)
         log('global_color_table', self.global_color_table)
         log('graphic_control_extension', self.graphic_control_extension)
+        log('image_descriptor', self.image_descriptor)
+        log('local_color_table', self.local_color_table)
         log('hex_str', self.hex_str)
-        # todo get_next_four_str()
         log('global_color_table next 4 string', self.hex_str[0:4])
     
 
@@ -119,6 +129,8 @@ def main():
     gifParser.get_global_color_table()
     gifParser.reslove_hex_str()
     gifParser.reslove_graphic_control_extension()
+    gifParser.get_image_descriptor()
+    gifParser.get_local_color_table()
     gifParser.test()
     # process_pic = {
     #     "21f9":skip_extensions,
