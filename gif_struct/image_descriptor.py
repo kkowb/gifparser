@@ -32,19 +32,10 @@ def image_descriptor_packed_filed(str):
 
 
 def reslove_image_descriptor(str):
-    if str.startswith("2c"):
-        size = image_size(str)
-        packed_filed = image_descriptor_packed_filed(str)
-        res = {
-            "image_size": size,
-            "packed_filed": packed_filed,
-        }
-        # log("image_descriptor", res)
-        return res
-    else:
-        log("is not image_descriptor", str)
-
-
-def skip_image_descriptor(str):
-    skip_image_descriptor = str[20:]
-    return skip_image_descriptor
+    size = image_size(str)
+    packed_filed = image_descriptor_packed_filed(str)
+    res = {
+        "image_size": size,
+        "packed_filed": packed_filed,
+    }
+    return res
