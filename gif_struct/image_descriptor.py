@@ -39,3 +39,7 @@ def reslove_image_descriptor(str):
         "packed_filed": packed_filed,
     }
     return res
+
+def skip_image_descriptor(str):
+    skip_image_descriptor = str[20:]
+    return skip_image_descriptor

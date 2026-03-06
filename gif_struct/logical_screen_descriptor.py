@@ -14,7 +14,7 @@ def packed_field_data(hex_str):
     return data_bin
 
 
-def resolve_packed_field(packed_field):
+def reslove_lsd_packed_field(packed_field):
     global_color_table_flag = packed_field[0]
     color_resolution = packed_field[1:4]
     sort_flag = packed_field[4]

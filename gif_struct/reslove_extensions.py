@@ -13,7 +13,7 @@ def skip_global_color_table(table, hex_str):
     return str
 
 
-def reslove_packed_field(filed):
+def reslove_gce_packed_field(filed):
     filed_bin = hex_to_bin(filed)
     res = {
         "reserved_for_future_use": filed_bin[0:3],
@@ -28,7 +28,7 @@ def graphic_control_extension(hex_str):
     # hex_str = hex_str[4:]
     byte_size = hex_str[4:6]
     p = hex_str[6:8]
-    packed_field = reslove_packed_field(p)
+    packed_field = reslove_gce_packed_field(p)
     delay_time = hex_str[8:12]
     transparent_color_index = hex_str[12:14]
     res = {

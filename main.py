@@ -12,23 +12,9 @@ from gif_struct.image_descriptor import reslove_image_descriptor, skip_image_des
 from gif_struct.logical_screen_descriptor import (
     canvas_data,
     packed_field_data,
-    resolve_packed_field,
+    reslove_lsd_packed_field,
 )
 
-
-# def get_local_color_table():
-#     image_descriptor = get_image_descriptor()
-#     packed_filed = image_descriptor["packed_filed"]
-#     size = packed_filed["size_of_local_color_table"]
-#     if size == 0:
-#         log("no local color table")
-#         return None
-#     str = reslove_extensions()
-#     data = skip_image_descriptor(str)
-#     local_color_table = data[0 : size * 3 * 2]
-#     log("local_color_table", local_color_table)
-#     return local_color_table
-    
 
 # def get_image_data():
 #     str = reslove_extensions()
@@ -62,7 +48,7 @@ class GifParser():
         hexStr = self.hex_str[12:26]
         canvas_width, canvas_height = canvas_data(hexStr)
         packed_field = packed_field_data(hexStr)
-        rpf = resolve_packed_field(packed_field)
+        rpf = reslove_lsd_packed_field(packed_field)
         background_color_index = hexStr[10:12]
         pixel_aspect_ratio = hexStr[12:14]
         r = {
