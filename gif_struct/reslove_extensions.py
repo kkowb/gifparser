@@ -39,12 +39,19 @@ def graphic_control_extension(hex_str):
     }
     return res
 
-
-def reslove_other_extension(data):
-
-    log("other_extension", data)
-
-    pass
+# 21 01 0C 00 00 00 00 64 00 64 00 14 14 01 00 0B 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
+def other_extension_nums(hex_str):
+    data = hex_str[4:]
+    data_len = 4
+    while True:
+        num_of_bytes = int(data[0:2], 16)
+        data_len += 2
+        if num_of_bytes == 0:
+            break
+        num = num_of_bytes * 2
+        data_len += num
+        data = data[2 + num_of_bytes * 2 :]
+    return data_len
 
 
 # def skip_extensions(hex_str):

@@ -7,6 +7,7 @@ from lzw_decompression.decompression import decoding_bytes
 from gif_struct.reslove_extensions import (
     skip_global_color_table, 
     graphic_control_extension,
+    other_extension_nums,
 )
 from gif_struct.image_descriptor import reslove_image_descriptor, skip_image_descriptor
 from gif_struct.logical_screen_descriptor import (
@@ -93,7 +94,12 @@ class GifParser():
         hex_str = self.hex_str
         local_color_table = hex_str[0 : size * 3 * 2]
         self.local_color_table = local_color_table
+        self.hex_str = hex_str[size * 3 * 2 :]
     
+    def skip_extensions(self):
+        index = other_extension_nums(self.hex_str)
+        self.hex_str = self.hex_str[index:]
+
     def test(self):
         log('logical_screen_descriptor', self.logical_screen_descriptor_data)
         log('global_color_table', self.global_color_table)
