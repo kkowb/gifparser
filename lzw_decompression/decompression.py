@@ -1,17 +1,20 @@
 from .decoder import DecoderBytes
 
 def get_all_data(str):
-    print("image data", str)
     min_code_size = int(str[0:2], 16)
     data = str[2:]
     all_data = ''
+    # len_skip初始值2是因为上面已经跳过了 min_code_size 的两位十六进制字符串
+    len_for_skip = 2
     while True:
         num_of_bytes = int(data[0:2], 16)
         if num_of_bytes == 0:
+            len_for_skip += 2
             break
         all_data += data[2: 2 + num_of_bytes * 2]
         data = data[2 + num_of_bytes * 2 :]
-    return all_data, min_code_size
+        len_for_skip += 2 + num_of_bytes * 2
+    return all_data, min_code_size, len_for_skip
 
 
 def hex_to_binary(hex_str):
@@ -27,13 +30,15 @@ def hex_to_binary(hex_str):
     return full_bits
 
 
-def get_code(binary, min_code_size):
+def get_index_stream(binary, min_code_size):
     decoder = DecoderBytes(binary, min_code_size)
-    decoder.start()
+    index_stream = decoder.start()
+    return index_stream
 
 
 def decoding_bytes(str):
     all_data, min_code_size = get_all_data(str)
     print("all_data", all_data)
     binary = hex_to_binary(all_data)
-    code = get_code(binary, min_code_size)
+    index_stream = get_index_stream(binary, min_code_size)
+    return index_stream

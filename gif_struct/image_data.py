@@ -1,7 +1,7 @@
 from utils import log
 
 
-def image_data(local_color_table, data):
+def skip_local_color_table(local_color_table, data):
     if local_color_table is None:
         local_color_table_len = 0
     else:

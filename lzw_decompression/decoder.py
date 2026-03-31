@@ -111,7 +111,8 @@ class DecoderBytes():
             parse_code = self.parse_code(code_to_parse)
             if parse_code == self.eoi_code:
                 log("解码结束index_stream是", self.index_stream)
-                break
+                index_stream = self.index_stream
+                return index_stream
 
             log("parse_code", parse_code)
 
