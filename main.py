@@ -91,7 +91,8 @@ class GifParser():
         image_descriptor = self.image_descriptor[-1]
         packed_filed = image_descriptor["packed_filed"]
         size = packed_filed["size_of_local_color_table"]
-        if size == 0:
+        flag = packed_filed["local_color_table_flag"]
+        if flag == '0':
             log("no local color table")
             self.local_color_table.append('')
             return
@@ -101,6 +102,7 @@ class GifParser():
         self.hex_str = hex_str[size * 3 * 2 :]
     
     def skip_extensions(self):
+        log("skip_extensions inside", self.hex_str)
         index = other_extension_nums(self.hex_str)
         self.hex_str = self.hex_str[index:]
 
@@ -108,14 +110,15 @@ class GifParser():
         local_color_table = self.local_color_table[-1]
         hex_str = self.hex_str
         data = skip_local_color_table(local_color_table, hex_str)
-        log('hex_str0', data)
+        # log('hex_str1', data)
         all_data, min_code_size, len_for_skip = get_all_data(data)
-        log('all_data and min_code_size', all_data, min_code_size)
+        # log('all_data and min_code_size', all_data, min_code_size)
         self.image_data.append(all_data)
         self.min_code_size.append(min_code_size)
         self.hex_str = self.hex_str[len_for_skip:]
 
     def test(self):
+        log("==============================================================")
         log('logical_screen_descriptor', self.logical_screen_descriptor_data)
         log('global_color_table', self.global_color_table)
         log('graphic_control_extension', self.graphic_control_extension)
@@ -125,12 +128,14 @@ class GifParser():
         log('min_code_size', self.min_code_size)
         log('hex_str', self.hex_str)
         log('global_color_table next 4 string', self.hex_str[0:4])
+        pass
     
 
 def main():
     clear_log_file()
     # file_path = "gif/sample_1.gif"
-    file_path = "gif/sample_1_enlarged.gif"
+    # file_path = "gif/sample_1_enlarged.gif"
+    file_path = "gif/Dancing.gif"
     # file_path = "gif/sample_1_animation.gif"
     gifParser = GifParser(file_path)
     gifParser.signature_and_version()
@@ -138,6 +143,7 @@ def main():
     gifParser.get_global_color_table()
     gifParser.reslove_hex_str()
     gifParser.reslove_graphic_control_extension()
+    gifParser.skip_extensions() #dancing 有评论扩展
     gifParser.get_image_descriptor()
     gifParser.get_local_color_table()
     gifParser.get_image_data()

@@ -26,7 +26,7 @@ def image_descriptor_packed_filed(str):
         "interlace_flag": bin_8bit[1],
         "sort_flag": bin_8bit[2],
         "reserved_for_future_use": bin_8bit[3:5],
-        "size_of_local_color_table": int(bin_8bit[5:8], 2),
+        "size_of_local_color_table": int(bin_8bit[5:], 2),
     }
     return res
 
