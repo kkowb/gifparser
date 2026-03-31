@@ -32,8 +32,7 @@ from gif_struct.logical_screen_descriptor import (
 
 class GifParser():
     def __init__(self, gif_path):
-        self.gif_path = gif_path
-        self.hex_str = read_gif_hex()
+        self.hex_str = read_gif_hex(gif_path)
         self.logical_screen_descriptor_data = {}
         self.global_color_table = ''
         self.graphic_control_extension = []
@@ -130,9 +129,9 @@ class GifParser():
 
 def main():
     clear_log_file()
-    # signature_and_version()
-    # decoding_image_data()
-    file_path = "gif/sample_1.gif"
+    # file_path = "gif/sample_1.gif"
+    file_path = "gif/sample_1_enlarged.gif"
+    # file_path = "gif/sample_1_animation.gif"
     gifParser = GifParser(file_path)
     gifParser.signature_and_version()
     gifParser.logical_screen_descriptor()
