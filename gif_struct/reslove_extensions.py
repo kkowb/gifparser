@@ -39,6 +39,25 @@ def graphic_control_extension(hex_str):
     }
     return res
 
+
+def application_extension(hex_str):
+    data = hex_str[4:]
+    block_size = int(data[0:2], 16)
+    app_data = data[2:2 + block_size * 2]
+    app_identifier = bytes.fromhex(app_data[0:16]).decode("ascii")
+    auth_code = bytes.fromhex(app_data[16:22]).decode("ascii")
+    sub_data = data[2 + block_size * 2:]
+    # 21 FF 0B 4E 45 54 53 43 41 50 45 32 2E 30 03 01 00 00 00
+    count = sub_data[4:8]
+    loop_count = int(count[::-1], 16)
+    result = {
+        "app_identifier": app_identifier,
+        "auth_code": auth_code,
+        "loop_count": loop_count
+    }
+    return result
+
+
 # 21 01 0C 00 00 00 00 64 00 64 00 14 14 01 00 0B 68 65 6C 6C 6F 20 77 6F 72 6C 64 00
 def other_extension_nums(hex_str):
     data = hex_str[4:]

@@ -8,6 +8,7 @@ from gif_struct.reslove_extensions import (
     skip_global_color_table, 
     graphic_control_extension,
     other_extension_nums,
+    application_extension,
 )
 from gif_struct.image_descriptor import reslove_image_descriptor, skip_image_descriptor
 from gif_struct.logical_screen_descriptor import (
@@ -40,6 +41,7 @@ class GifParser():
         self.local_color_table = []
         self.image_data = []
         self.min_code_size = []
+        self.application_extension = {}
 
     def signature_and_version(self):
         signature, version = get_header(self.hex_str)
@@ -81,6 +83,11 @@ class GifParser():
         self.graphic_control_extension.append(d)
         self.hex_str = self.hex_str[16:]
     
+    def reslove_application_extension(self):
+        d = application_extension(self.hex_str)
+        self.application_extension = d
+        self.hex_str = self.hex_str[38:]
+
     def get_image_descriptor(self):
         image_descriptor = reslove_image_descriptor(self.hex_str)
         # self.image_descriptor = image_descriptor
@@ -101,8 +108,9 @@ class GifParser():
         self.local_color_table.append(local_color_table)
         self.hex_str = hex_str[size * 3 * 2 :]
     
+    # 用于跳过 纯文本扩展(2101) 和 评论扩展(21fe)
     def skip_extensions(self):
-        log("skip_extensions inside", self.hex_str)
+        # log("skip_extensions inside", self.hex_str)
         index = other_extension_nums(self.hex_str)
         self.hex_str = self.hex_str[index:]
 
