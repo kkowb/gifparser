@@ -36,9 +36,8 @@ def get_index_stream(binary, min_code_size):
     return index_stream
 
 
-def decoding_bytes(str):
-    all_data, min_code_size = get_all_data(str)
-    print("all_data", all_data)
+def decoding_bytes(all_data, min_code_size):
+    # all_data, min_code_size = get_all_data(str)
     binary = hex_to_binary(all_data)
     index_stream = get_index_stream(binary, min_code_size)
     return index_stream
