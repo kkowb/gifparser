@@ -16,8 +16,12 @@ from gif_struct.logical_screen_descriptor import (
     packed_field_data,
     reslove_lsd_packed_field,
 )
-from render import show_gif_frame,parse_palette
-
+from render import (
+    parse_palette,
+    draw_frame,
+    show_animation
+)
+import pygame
 # def get_image_data():
 #     str = reslove_extensions()
 #     local_color_table = get_local_color_table()
@@ -180,51 +184,139 @@ def main(file_path):
         # gifParser.test()
         func()        
     gifParser.test()
-    ################################################### 
-    index_stream = gifParser.index_stream[0]
+    ###################################################
+    # GIF Animation 渲染
+    ###################################################
 
-
-    # 字符串转数字
-    pixel_indices = [
-        int(i)
-        for i in index_stream
-    ]
-
-
-    # 调色板
     palette = parse_palette(
         gifParser.global_color_table
     )
 
 
-    descriptor = gifParser.image_descriptor[0]
+    # GIF逻辑屏幕大小
+    canvas_width = gifParser.logical_screen_descriptor_data[
+        "canvas_width"
+    ]
+
+    canvas_height = gifParser.logical_screen_descriptor_data[
+        "canvas_height"
+    ]
 
 
-    width = descriptor["image_size"]["width"]
-    height = descriptor["image_size"]["height"]
+    ###################################################
+    # 创建 GIF 总画布
+    ###################################################
 
-
-    print("width:",width)
-    print("height:",height)
-
-    print(
-        "pixel count:",
-        len(pixel_indices)
+    canvas = pygame.Surface(
+        (
+            canvas_width,
+            canvas_height
+        )
     )
 
 
-    show_gif_frame(
-        pixel_indices,
-        palette,
-        width,
-        height
+    # 背景颜色
+    background_index = int(
+        gifParser.logical_screen_descriptor_data[
+            "background_color_index"
+        ],
+        16
     )
 
+
+    canvas.fill(
+        palette[background_index]
+    )
+
+
+
+    ###################################################
+    # 保存每一帧
+    ###################################################
+
+    frames = []
+
+
+    for i, index_stream in enumerate(
+            gifParser.index_stream
+    ):
+
+
+        print("======================")
+        print("render frame:", i)
+
+
+        descriptor = gifParser.image_descriptor[i]
+
+
+        print(
+            "frame size:",
+            descriptor["image_size"]
+        )
+
+
+        ###################################################
+        # 关键:
+        # 当前帧不是重新生成图片
+        # 而是在上一帧canvas基础上更新
+        ###################################################
+
+        draw_frame(
+            canvas,
+            index_stream,
+            palette,
+            descriptor
+        )
+
+
+        ###################################################
+        # 保存当前完整画面
+        ###################################################
+
+        frame = canvas.copy()
+
+
+        frames.append(
+            frame
+        )
+
+
+
+    ###################################################
+    # GIF delay
+    ###################################################
+
+    delays = []
+
+
+    for gce in gifParser.graphic_control_extension:
+        delay_hex = gce["delay_time"]
+        # GIF是小端序
+        delay = int(
+            delay_hex[2:4] + delay_hex[0:2],
+            16
+        )
+        # GIF规范:
+        # delay单位是1/100秒
+        delays.append(
+            delay
+        )
+
+    print("frame count:", len(frames))
+    print("delays:", delays)
+
+    ###################################################
+    # 播放动画
+    ###################################################
+
+    show_animation(
+        frames,
+        delays
+    )
 
 if __name__ == "__main__":
     # file_path = "gif/sample_1.gif"
-    file_path = "gif/sample_1_enlarged.gif"
+    # file_path = "gif/sample_1_enlarged.gif"
     # file_path = "gif/sample_2_animation.gif"
-    # file_path = "gif/Dancing.gif"
+    file_path = "gif/Dancing.gif"
     main(file_path)
-

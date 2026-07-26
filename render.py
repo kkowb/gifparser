@@ -1,121 +1,129 @@
 import pygame
+import time
+
 
 
 def parse_palette(hex_color_table):
-    """
-    十六进制颜色表:
 
-    ff000000ff00ffff00
+    palette=[]
 
-    转换:
+    for i in range(0,len(hex_color_table),6):
 
-    [
-        (255,0,0),
-        (0,255,0),
-        ...
-    ]
-    """
-
-    palette = []
-
-    for i in range(0, len(hex_color_table), 6):
-
-        r = int(hex_color_table[i:i+2], 16)
-        g = int(hex_color_table[i+2:i+4], 16)
-        b = int(hex_color_table[i+4:i+6], 16)
+        r=int(hex_color_table[i:i+2],16)
+        g=int(hex_color_table[i+2:i+4],16)
+        b=int(hex_color_table[i+4:i+6],16)
 
         palette.append(
-            (r, g, b)
+            (r,g,b)
         )
 
     return palette
 
 
 
-def render_image(
-        pixel_indices,
+
+def draw_frame(
+        canvas,
+        index_stream,
         palette,
-        width,
-        height
+        descriptor
 ):
 
-    """
-    index像素流 + 调色板
-    生成pygame Surface
-    """
+    left = descriptor["image_size"]["left"]
+    top = descriptor["image_size"]["top"]
 
-    surface = pygame.Surface(
-        (
-            width,
-            height
-        )
-    )
+    width = descriptor["image_size"]["width"]
+    height = descriptor["image_size"]["height"]
 
 
     for y in range(height):
 
         for x in range(width):
 
-            index = pixel_indices[
+            index = index_stream[
                 y * width + x
             ]
-
 
             color = palette[index]
 
 
-            surface.set_at(
-                (x, y),
+            canvas.set_at(
+                (
+                    left+x,
+                    top+y
+                ),
                 color
             )
 
 
-    return surface
 
 
-
-
-def show_gif_frame(
-        pixel_indices,
+def create_frame(
+        canvas_width,
+        canvas_height,
+        index_stream,
         palette,
-        width,
-        height
+        descriptor
 ):
+
+    """
+    创建一帧完整canvas
+    """
+
+
+    canvas = pygame.Surface(
+        (
+            canvas_width,
+            canvas_height
+        )
+    )
+
+
+    canvas.fill(
+        palette[0]
+    )
+
+
+    draw_frame(
+        canvas,
+        index_stream,
+        palette,
+        descriptor
+    )
+
+
+    return canvas
+
+
+
+
+def show_animation(
+        frames,
+        delays
+):
+
 
     pygame.init()
 
 
-    # 获取当前屏幕大小
-    info = pygame.display.Info()
-
-    screen_width = info.current_w
-    screen_height = info.current_h
+    width,height = frames[0].get_size()
 
 
-
-    # 最大显示区域
-    max_width = 500
-    max_height = 500
+    max_size=500
 
 
-    # 自动计算缩放比例
-    scale = min(
-        max_width / width,
-        max_height / height
+    scale=min(
+        max_size/width,
+        max_size/height
     )
 
 
-    show_width = int(
-        width * scale
-    )
-
-    show_height = int(
-        height * scale
-    )
+    show_width=int(width*scale)
+    show_height=int(height*scale)
 
 
 
-    screen = pygame.display.set_mode(
+    screen=pygame.display.set_mode(
         (
             show_width,
             show_height
@@ -128,40 +136,17 @@ def show_gif_frame(
     )
 
 
-
-    # 原始像素渲染
-    surface = render_image(
-        pixel_indices,
-        palette,
-        width,
-        height
-    )
+    index=0
 
 
+    clock=pygame.time.Clock()
 
-    # 根据屏幕缩放
-    surface = pygame.transform.smoothscale(
-        surface,
-        (
-            show_width,
-            show_height
-        )
-    )
+
+    last_time=time.time()
 
 
 
-    # 居中显示位置
-    x = (
-        show_width - surface.get_width()
-    ) // 2
-
-    y = (
-        show_height - surface.get_height()
-    ) // 2
-
-
-
-    running = True
+    running=True
 
 
     while running:
@@ -171,21 +156,36 @@ def show_gif_frame(
 
             if event.type == pygame.QUIT:
 
-                running = False
+                running=False
 
 
 
-        screen.fill(
-            (0,0,0)
+        now=time.time()
+
+
+        # delay_time 单位是 1/100 秒
+        if now-last_time >= max(delays[index],1)/100:
+            index += 1
+
+            if index >= len(frames):
+                index=0
+
+            last_time=now
+
+
+
+        surface=pygame.transform.scale(
+            frames[index],
+            (
+                show_width,
+                show_height
+            )
         )
 
 
         screen.blit(
             surface,
-            (
-                x,
-                y
-            )
+            (0,0)
         )
 
 
